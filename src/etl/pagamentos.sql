@@ -50,9 +50,9 @@ tb_group AS (
 
   GROUP BY idVendedor, descTipoPagamento
   ORDER BY idVendedor, descTipoPagamento
-)
-
-SELECT DISTINCT idVendedor,
+),
+tb_summary AS (
+  SELECT DISTINCT idVendedor,
         sum(case when descTipoPagamento = 'boleto' then qtdePedidoMeioPagamento else 0 end) as qtde_boleto_pedido, 
         sum(case when descTipoPagamento = 'credit_card' then qtdePedidoMeioPagamento else 0 end) as qtde_credit_card_pedido, 
         sum(case when descTipoPagamento = 'voucher' then qtdePedidoMeioPagamento else 0 end) as qtde_voucher_pedido, 
@@ -73,35 +73,36 @@ SELECT DISTINCT idVendedor,
         sum(case when descTipoPagamento='voucher' then vlPedidoMeioPagamento else 0 end) / sum(vlPedidoMeioPagamento) as pct_valor_voucher_pedido,
         sum(case when descTipoPagamento='debit_card' then vlPedidoMeioPagamento else 0 end) / sum(vlPedidoMeioPagamento) as pct_valor_debit_card_pedido
 
-FROM tb_group
+  FROM tb_group
 
-GROUP BY idVendedor
+  GROUP BY idVendedor
+),
 
+tb_cartao AS (
+  SELECT idVendedor,
+          AVG(nrParcelas) AS avgQtdeParcelas,
+          PERCENTILE(nrParcelas, 0.5) AS medianQtdeParcelas,
+          MAX(nrParcelas) AS maxQtdeParcelas,
+          MIN(nrParcelas) AS minQtdeParcelas
 
--- COMMAND ----------
+  FROM tb_join
 
-tb_pedidos AS (
-  SELECT
-    DISTINCT
-    t1.idPedido,
-    t2.idVendedor
+  WHERE descTipoPagamento = 'credit_card'
 
-  FROM silver.olist.pedido AS T1
-
-  LEFT JOIN silver.olist.item_pedido as t2
-  ON t1.idPedido = t2.idPedido
-
-  WHERE t1.dtPedido < '2018-01-01'
-
-  AND dtPedido >= add_months('2018-01-01', -6)
+  GROUP BY idVendedor
 )
 
+SELECT '2018-01-01'AS dtReference,
+        t1.*,
+        t2.avgQtdeParcelas,
+        t2.medianQtdeParcelas,
+        t2.maxQtdeParcelas,
+        t2.minQtdeParcelas
+        
+FROM tb_summary AS t1
 
-
--- COMMAND ----------
-
-select *
-from silver.olist.pedido
+LEFT JOIN tb_cartao AS t2
+ON t1.idVendedor = t2.idVendedor
 
 -- COMMAND ----------
 
