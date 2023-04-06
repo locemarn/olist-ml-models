@@ -10,21 +10,34 @@ ORDER BY 1
 
 -- COMMAND ----------
 
-WITH tb_join AS (
-  SELECT t2.*,
-        t3.idVendedor
 
-  FROM silver.olist.pedido AS t1
 
-  LEFT JOIN silver.olist.pagamento_pedido as t2
+-- COMMAND ----------
+
+WITH tb_pedidos AS (
+  SELECT DISTINCT
+    t1.idPedido,
+    t2.idVendedor
+
+  from silver.olist.pedido AS t1
+
+  LEFT JOIN silver.olist.item_pedido as t2
   ON t1.idPedido = t2.idPedido
-
-  LEFT JOIN silver.olist.item_pedido AS t3
-  ON t1.idPedido = t3.idPedido
 
   WHERE t1.dtPedido < '2018-01-01'
   AND t1.dtPedido >= add_months('2018-01-01', -6)
-  AND t3.idVendedor IS NOT NULL
+  AND idVendedor IS NOT NULL
+),
+
+tb_join AS (
+  SELECT 
+      t1.idVendedor,
+      t2.*
+
+  FROM tb_pedidos AS t1
+
+  LEFT JOIN silver.olist.pagamento_pedido as t2
+  ON t1.idPedido = t2.idPedido
 ),
 
 tb_group AS (
@@ -62,8 +75,33 @@ SELECT DISTINCT idVendedor,
 
 FROM tb_group
 
-GROUP BY 1
+GROUP BY idVendedor
 
+
+-- COMMAND ----------
+
+tb_pedidos AS (
+  SELECT
+    DISTINCT
+    t1.idPedido,
+    t2.idVendedor
+
+  FROM silver.olist.pedido AS T1
+
+  LEFT JOIN silver.olist.item_pedido as t2
+  ON t1.idPedido = t2.idPedido
+
+  WHERE t1.dtPedido < '2018-01-01'
+
+  AND dtPedido >= add_months('2018-01-01', -6)
+)
+
+
+
+-- COMMAND ----------
+
+select *
+from silver.olist.pedido
 
 -- COMMAND ----------
 
