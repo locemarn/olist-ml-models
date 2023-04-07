@@ -17,6 +17,7 @@ WITH tb_pedido as (
 
   WHERE dtPedido < '2018-01-01'
   AND dtPedido >= add_months('2018-01-01', -6)
+  AND idVendedor IS NOT NULL
 
   GROUP BY t1.idPedido,
             t2.idVendedor,
@@ -28,7 +29,8 @@ WITH tb_pedido as (
 )
 
 
-SELECT idVendedor,
+SELECT '2018-01-01' AS dtReference,
+        idVendedor,
 
         count(
           distinct case when descSituacao = 'delivered' 
@@ -52,7 +54,7 @@ SELECT idVendedor,
         
 FROM tb_pedido
 
-GROUP BY 1
+GROUP BY idVendedor
 
 
 
