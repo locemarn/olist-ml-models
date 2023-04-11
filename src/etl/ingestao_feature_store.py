@@ -3,7 +3,7 @@
 
 # COMMAND ----------
 
- mimport datetime
+import datetime
 from tqdm import tqdm
 
 def import_query(path): 
