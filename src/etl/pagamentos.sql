@@ -1,4 +1,3 @@
--- Databricks notebook source
 SELECT DATE(dtPedido) as dtPedido,
         count(*) as qtPedido
 
@@ -8,11 +7,6 @@ GROUP BY 1
 
 ORDER BY 1
 
--- COMMAND ----------
-
-
-
--- COMMAND ----------
 
 WITH tb_pedidos AS (
   SELECT DISTINCT
@@ -24,8 +18,8 @@ WITH tb_pedidos AS (
   LEFT JOIN silver.olist.item_pedido as t2
   ON t1.idPedido = t2.idPedido
 
-  WHERE t1.dtPedido < '2018-01-01'
-  AND t1.dtPedido >= add_months('2018-01-01', -6)
+  WHERE t1.dtPedido < '{date}'
+  AND t1.dtPedido >= add_months('{date}', -6)
   AND idVendedor IS NOT NULL
 ),
 
@@ -92,7 +86,7 @@ tb_cartao AS (
   GROUP BY idVendedor
 )
 
-SELECT '2018-01-01'AS dtReference,
+SELECT '{date}'AS dtReference,
         t1.*,
         t2.avgQtdeParcelas,
         t2.medianQtdeParcelas,
@@ -103,7 +97,3 @@ FROM tb_summary AS t1
 
 LEFT JOIN tb_cartao AS t2
 ON t1.idVendedor = t2.idVendedor
-
--- COMMAND ----------
-
-

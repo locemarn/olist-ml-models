@@ -1,4 +1,3 @@
--- Databricks notebook source
 WITH tb_pedido AS (
 
   SELECT t1.idPedido,
@@ -46,7 +45,3 @@ SELECT
 FROM tb_pedido
 
 GROUP BY 1,2,3
-
--- COMMAND ----------
-
- 

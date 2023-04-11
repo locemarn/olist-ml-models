@@ -1,4 +1,3 @@
--- Databricks notebook source
 WITH tb_pedido_item AS (
 
   SELECT t2.*,
@@ -116,14 +115,3 @@ ON t1.idVendedor = t3.idVendedor
 
 LEFT JOIN tb_intervalo as t4
 ON t1.idVendedor = t4.idVendedor
-
-
-
-
-
-
-
-
--- COMMAND ----------
-
-
